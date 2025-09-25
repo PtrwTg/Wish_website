@@ -206,51 +206,48 @@
     </div>
 
     <script>
-        // LIFF ID ของคุณ (จาก script.js ที่ส่งมา)
+        // ** CONFIGURATION **
         const liffId = '2008162847-a7gLZonM'; 
-        let myUserId = ''; // ตัวแปรสำหรับเก็บ LINE User ID ที่ล็อกอินแล้ว
+        let myUserId = ''; 
 
-        // ตัวอย่างข้อมูลคำอวยพร (Mock Data - ควรดึงจาก Backend จริง)
-        let allWishes = [
-            { id: 1, lineId: 'Uother_id_1', name: 'คุณแม่', message: 'ลูกรัก! แม่ภูมิใจในตัวลูกที่สุดเลยนะ ขอให้มีชีวิตที่สดใสและประสบความสำเร็จในทุกเส้นทางที่เลือกเดินจ้า 💖' },
-            { id: 2, lineId: 'Uother_id_2', name: 'เพื่อนสมัยมัธยม', message: 'ยินดีด้วยนะเพื่อน! เก่งมากๆ เลย ขอให้เจองานที่รักและมีความสุขมากๆ นะ' },
-            { id: 3, lineId: 'Uother_id_3', name: 'พี่ที่ทำงานเก่า', message: 'ดีใจด้วยครับ/ค่ะ น้องเสือ! ขยัน อดทนแบบนี้ไปได้ไกลแน่นอน สู้ๆ นะ' },
-        ];
+        // 🚨 IMPORTANT: ต้องเปลี่ยน URL นี้ให้ตรงกับ Backend (FN) ของคุณ
+        const apiBaseUrl = 'https://website-degree-bn.onrender.com';
+        const apiEndpoint = `${apiBaseUrl}/wishes`; 
 
+        let allWishes = []; // ข้อมูลจะถูกดึงมาเก็บที่นี่
+        // ** END CONFIGURATION **
+
+        // DOM Elements
         const nameInput = document.getElementById('name');
         const messageInput = document.getElementById('message');
         const statusText = document.getElementById('form-status');
         const wishesDisplay = document.getElementById('wishes-display');
         const loginMessage = document.getElementById('login-message');
         
-        // กำหนดสีพาสเทลสำหรับกระดาษโน้ต
         const noteColors = ['#fff59d', '#80cbc4', '#ffab91', '#b39ddb', '#e6ee9c']; 
         
-        // ฟังก์ชันหลัก: เริ่มต้น LIFF และล็อกอิน (ใช้ Logic ที่คุณส่งมาเป็น Base)
+        // ===================================
+        // 🚀 LIFF Initialization
+        // ===================================
+
         async function initializeLiff() {
             try {
-                // 1. เริ่มต้น LIFF
                 await liff.init({ liffId: liffId });
                 loginMessage.textContent = 'เชื่อมต่อ LIFF สำเร็จ...';
 
-                // 2. ตรวจสอบสถานะการล็อกอิน
                 if (!liff.isLoggedIn()) {
                     loginMessage.textContent = 'กำลังเปลี่ยนไปหน้าล็อกอิน...';
                     liff.login();
                 } else {
-                    // 3. ดึง Profile
                     const profile = await liff.getProfile();
-                    myUserId = profile.userId; // ใช้ myUserId ที่ได้จาก LIFF
+                    myUserId = profile.userId; 
 
-                    // 4. แสดงข้อมูลผู้ใช้
-                    // ใช้ || 'placeholder' เพื่อป้องกัน error หากไม่มี pictureUrl
                     document.getElementById('profile-picture').src = profile.pictureUrl || 'https://via.placeholder.com/50'; 
                     document.getElementById('profile-name').textContent = profile.displayName;
                     document.getElementById('profile-info-display').style.display = 'flex';
                     loginMessage.style.display = 'none';
 
-                    // 5. โหลดข้อมูลคำอวยพรและตั้งค่าฟอร์ม
-                    loadAndRenderWishes(profile.displayName);
+                    await fetchAndLoadWishes(profile.displayName);
                 }
             } catch (err) {
                 console.error('LIFF initialization failed', err);
@@ -258,79 +255,31 @@
             }
         }
 
-        // ฟังก์ชันสำหรับโหลดและเรนเดอร์ข้อมูลหลังการล็อกอิน
-        function loadAndRenderWishes(defaultName) {
-            
-            // 1. ค้นหาคำอวยพรของผู้ใช้ปัจจุบัน
-            const userWish = getCurrentUserWish();
+        // ===================================
+        // 🌐 API Call Functions
+        // ===================================
 
-            // 2. กำหนดค่าเริ่มต้นในฟอร์ม
-            if (userWish) {
-                nameInput.value = userWish.name; 
-                messageInput.value = userWish.message;
-                statusText.textContent = '💡 คุณเคยเขียนคำอวยพรแล้ว สามารถแก้ไขได้เลย';
-                statusText.style.color = '#7b1fa2';
-            } else {
-                // หากยังไม่เคยเขียนคำอวยพร ให้ใช้ LINE Display Name เป็นชื่อเริ่มต้น
-                nameInput.value = defaultName || ''; 
-                messageInput.value = '';
-                statusText.textContent = '✨ คุณยังไม่ได้เขียนคำอวยพรเลย เขียนเลยสิ!';
-                statusText.style.color = '#7b1fa2';
+        /** ดึงข้อมูลคำอวยพรทั้งหมดจาก Backend */
+        async function fetchAndLoadWishes(defaultName) {
+            try {
+                const response = await fetch(apiEndpoint);
+                if (!response.ok) throw new Error('Failed to fetch wishes from API');
+                
+                allWishes = await response.json();
+                
+                loadAndRenderWishes(defaultName);
+                
+            } catch (error) {
+                console.error('Error fetching wishes:', error);
+                // แสดงข้อความผิดพลาดบนหน้าเว็บหากเรียก API ไม่สำเร็จ
+                statusText.textContent = '⚠️ ไม่สามารถโหลดคำอวยพรจากเซิร์ฟเวอร์ได้';
+                statusText.style.color = '#d32f2f';
+                wishesDisplay.innerHTML = '<p style="text-align: center; color: #757575;">ไม่สามารถแสดงคำอวยพรได้ในขณะนี้</p>';
             }
-            
-            // 3. กำหนด myUserId ใน Hidden Field 
-            document.getElementById('line-id-hidden').value = myUserId; 
-
-            // 4. เรนเดอร์การ์ดคำอวยพรทั้งหมด
-            renderWishes();
         }
 
-        // ฟังก์ชันค้นหาคำอวยพรของผู้ใช้ปัจจุบัน (ใช้ myUserId)
-        function getCurrentUserWish() {
-            return allWishes.find(wish => wish.lineId === myUserId);
-        }
-
-        // ฟังก์ชันแสดงผลคำอวยพรทั้งหมด (รวม Animation Staggered Delay)
-        function renderWishes() {
-            wishesDisplay.innerHTML = ''; 
-            
-            const currentUserWish = getCurrentUserWish();
-            let sortedWishes = [...allWishes].filter(wish => wish.lineId !== myUserId);
-            if (currentUserWish) {
-                sortedWishes.unshift(currentUserWish);
-            }
-
-            sortedWishes.forEach((wish, index) => {
-                const card = document.createElement('div');
-                card.className = 'wish-card';
-
-                let colorIndex = index % noteColors.length;
-                let cardColor = noteColors[colorIndex];
-                
-                if (wish.lineId === myUserId) {
-                    cardColor = '#a8e6cf'; 
-                    card.style.fontWeight = '600'; 
-                }
-                card.style.backgroundColor = cardColor;
-                
-                let randomRotation = (Math.random() * 6) - 3; 
-                
-                card.style.setProperty('--random-rotation', `${randomRotation}deg`); 
-                card.style.animationDelay = `${index * 0.1}s`; 
-
-                card.innerHTML = `
-                    <p>“${wish.message}”</p>
-                    <span class="author">
-                        — ${wish.name} 
-                        ${wish.lineId === myUserId ? ' (ของคุณ)' : ''}
-                    </span>
-                `;
-                wishesDisplay.appendChild(card);
-            });
-        }
-
-        // ฟังก์ชันบันทึก/แก้ไขคำอวยพร (ต้องมีการเรียก API จริง)
-        function saveBlessing() {
+        /** บันทึก/แก้ไขคำอวยพรผ่าน Backend API (POST/PUT) */
+        async function saveBlessing() {
             if (!myUserId) {
                 alert('กรุณาล็อกอินด้วย LINE ก่อนบันทึก');
                 liff.login();
@@ -346,46 +295,76 @@
                 return;
             }
 
+            const wishData = {
+                line_user_id: myUserId, 
+                name: name,
+                message: message
+            };
+
+            let currentUserWish = getCurrentUserWish();
+            let method = currentUserWish ? 'PUT' : 'POST';
+            // สมมติว่า Backend ใช้ ID เป็น Parameter สำหรับการอัปเดต (PUT)
+            let url = currentUserWish ? `${apiEndpoint}/${currentUserWish.id}` : apiEndpoint; 
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(wishData)
+                });
+
+                if (response.ok) {
+                    statusText.textContent = `✅ ${method === 'POST' ? 'บันทึก' : 'แก้ไข'}คำอวยพรเรียบร้อยแล้ว`;
+                    statusText.style.color = '#4a148c';
+                    
+                    // ดึงข้อมูลใหม่และเรนเดอร์ทั้งหมดหลังการบันทึกสำเร็จ
+                    const profile = await liff.getProfile();
+                    await fetchAndLoadWishes(profile.displayName); 
+                } else {
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown Server Error' }));
+                    statusText.textContent = `❗ เกิดข้อผิดพลาด: ${errorData.error || 'Server Error'}`;
+                    statusText.style.color = '#d32f2f';
+                }
+            } catch (error) {
+                console.error('Error submitting data:', error);
+                statusText.textContent = '❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ Backend ได้';
+                statusText.style.color = '#d32f2f';
+            }
+        }
+
+        /** ลบคำอวยพรผ่าน Backend API (DELETE) */
+        async function deleteBlessing() {
+            if (!myUserId) return;
+
             let currentUserWish = getCurrentUserWish();
 
             if (currentUserWish) {
-                // แก้ไข (Update)
-                currentUserWish.name = name;
-                currentUserWish.message = message;
-                statusText.textContent = '✅ แก้ไขคำอวยพรเรียบร้อยแล้ว';
-                // *** ในโค้ดจริง: เรียก API PUT/PATCH ไปที่ Backend ***
-            } else {
-                // บันทึกใหม่ (Create)
-                const newId = allWishes.length + 1;
-                allWishes.push({
-                    id: newId,
-                    lineId: myUserId,
-                    name: name,
-                    message: message
-                });
-                statusText.textContent = '🎉 บันทึกคำอวยพรเรียบร้อยแล้ว';
-                // *** ในโค้ดจริง: เรียก API POST ไปที่ Backend ***
-            }
-            statusText.style.color = '#4a148c';
-
-            renderWishes();
-        }
-
-        // ฟังก์ชันลบคำอวยพร (ต้องมีการเรียก API จริง)
-        function deleteBlessing() {
-            if (!myUserId) return;
-
-            let currentUserWishIndex = allWishes.findIndex(wish => wish.lineId === myUserId);
-
-            if (currentUserWishIndex !== -1) {
                 if (confirm('ยืนยันที่จะลบคำอวยพรของคุณหรือไม่?')) {
-                    allWishes.splice(currentUserWishIndex, 1);
-                    nameInput.value = document.getElementById('profile-name').textContent || ''; // ตั้งชื่อกลับไปเป็น Display Name
-                    messageInput.value = ''; // เคลียร์ฟอร์ม
-                    statusText.textContent = '🗑️ ลบคำอวยพรเรียบร้อยแล้ว';
-                    statusText.style.color = '#d32f2f';
-                    // *** ในโค้ดจริง: เรียก API DELETE ไปที่ Backend ***
-                    renderWishes();
+                    try {
+                        const response = await fetch(`${apiEndpoint}/${currentUserWish.id}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            nameInput.value = document.getElementById('profile-name').textContent || ''; 
+                            messageInput.value = ''; 
+                            statusText.textContent = '🗑️ ลบคำอวยพรเรียบร้อยแล้ว';
+                            statusText.style.color = '#d32f2f';
+
+                            // ดึงข้อมูลใหม่และเรนเดอร์ทั้งหมดหลังการลบสำเร็จ
+                            const profile = await liff.getProfile();
+                            await fetchAndLoadWishes(profile.displayName); 
+
+                        } else {
+                            const errorData = await response.json().catch(() => ({ error: 'Unknown Server Error' }));
+                            statusText.textContent = `❗ เกิดข้อผิดพลาดในการลบ: ${errorData.error || 'Server Error'}`;
+                            statusText.style.color = '#d32f2f';
+                        }
+                    } catch (error) {
+                        console.error('Error deleting wish:', error);
+                        statusText.textContent = '❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ Backend ได้';
+                        statusText.style.color = '#d32f2f';
+                    }
                 }
             } else {
                 statusText.textContent = '❗ ไม่มีคำอวยพรของคุณที่จะลบ';
@@ -393,19 +372,99 @@
             }
         }
         
-        // รอให้ DOM โหลดเสร็จก่อนเรียก initializeLiff()
+        // ===================================
+        // 🎨 UI/Rendering Logic
+        // ===================================
+
+        function loadAndRenderWishes(defaultName) {
+            const userWish = getCurrentUserWish();
+
+            if (userWish) {
+                nameInput.value = userWish.name; 
+                messageInput.value = userWish.message;
+                statusText.textContent = '💡 คุณเคยเขียนคำอวยพรแล้ว สามารถแก้ไขได้เลย';
+                statusText.style.color = '#7b1fa2';
+            } else {
+                nameInput.value = defaultName || ''; 
+                messageInput.value = '';
+                statusText.textContent = '✨ คุณยังไม่ได้เขียนคำอวยพรเลย เขียนเลยสิ!';
+                statusText.style.color = '#7b1fa2';
+            }
+            
+            document.getElementById('line-id-hidden').value = myUserId; 
+            renderWishes();
+        }
+
+        function getCurrentUserWish() {
+            // สมมติว่า API คืนค่า object ที่มี key เป็น line_user_id
+            return allWishes.find(wish => wish.line_user_id === myUserId);
+        }
+
+        function renderWishes() {
+            wishesDisplay.innerHTML = ''; 
+            
+            const currentUserWish = getCurrentUserWish();
+            let sortedWishes = [...allWishes].filter(wish => wish.line_user_id !== myUserId);
+            if (currentUserWish) {
+                // นำคำอวยพรของผู้ใช้ปัจจุบันมาไว้ข้างหน้าสุด
+                sortedWishes.unshift(currentUserWish);
+            }
+
+            if (sortedWishes.length === 0) {
+                 wishesDisplay.innerHTML = '<p style="text-align: center; color: #757575; font-style: italic;">ยังไม่มีคำอวยพรในระบบเลย เขียนเป็นคนแรกสิ!</p>';
+                 return;
+            }
+
+            sortedWishes.forEach((wish, index) => {
+                const card = document.createElement('div');
+                card.className = 'wish-card';
+
+                let colorIndex = index % noteColors.length;
+                let cardColor = noteColors[colorIndex];
+                
+                // เน้นการ์ดของผู้ใช้ปัจจุบัน
+                if (wish.line_user_id === myUserId) { 
+                    cardColor = '#a8e6cf'; 
+                    card.style.fontWeight = '600'; 
+                }
+                card.style.backgroundColor = cardColor;
+                
+                let randomRotation = (Math.random() * 6) - 3; 
+                
+                card.style.setProperty('--random-rotation', `${randomRotation}deg`); 
+                card.style.animationDelay = `${index * 0.1}s`; 
+
+                card.innerHTML = `
+                    <p>“${wish.message}”</p>
+                    <span class="author">
+                        — ${wish.name} 
+                        ${wish.line_user_id === myUserId ? ' (ของคุณ)' : ''}
+                    </span>
+                `;
+                wishesDisplay.appendChild(card);
+            });
+        }
+        
+        // ===================================
+        // ⬇️ Main Entry Point
+        // ===================================
+        
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof liff !== 'undefined') {
                 initializeLiff();
             } else {
-                // สำหรับการทดสอบในเบราว์เซอร์ปกติ
+                // Mockup Logic สำหรับทดสอบในเบราว์เซอร์ปกติ
                 loginMessage.innerHTML = '<p>⚠️ ไม่พบ LIFF SDK กำลังจำลองผู้ใช้สำหรับการทดสอบ</p>';
                 myUserId = 'Umockup_line_id_12345';
                 document.getElementById('profile-info-display').style.display = 'flex';
                 document.getElementById('profile-picture').src = 'https://via.placeholder.com/50';
                 document.getElementById('profile-name').textContent = 'Test User (Mock)';
-                // เพิ่ม Mock Data สำหรับผู้ใช้คนนี้เพื่อให้เห็นการ์ดของตัวเอง
-                allWishes.push({ id: 99, lineId: myUserId, name: 'Test User (Mock)', message: 'นี่คือคำอวยพรจำลองของผู้ใช้ที่ล็อกอินอยู่' });
+                
+                // สร้าง Mock Data สำหรับเรนเดอร์
+                allWishes = [
+                    { id: 1, line_user_id: 'Uother_id_1', name: 'คุณแม่', message: 'ลูกรัก! แม่ภูมิใจในตัวลูกที่สุดเลยนะ 💖' },
+                    { id: 99, line_user_id: myUserId, name: 'Test User (Mock)', message: 'นี่คือคำอวยพรจำลองของผู้ใช้ที่ล็อกอินอยู่' },
+                ];
                 loadAndRenderWishes('Test User (Mock)');
             }
         });
@@ -413,4 +472,3 @@
     </script>
 </body>
 </html>
-
