@@ -38,6 +38,7 @@
             background: #fff;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             border-radius: 12px;
+            position: relative; /* สำหรับซ้อน Modal */
         }
         h1 {
             color: #4a148c;
@@ -79,6 +80,7 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             margin-bottom: 30px;
+            transition: opacity 0.3s;
         }
         label {
             display: block;
@@ -119,6 +121,7 @@
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 30px 20px; 
             padding: 10px;
+            transition: opacity 0.3s; /* เพื่อให้จางลงเมื่อ Modal แสดง */
         }
         .wish-card {
             padding: 20px;
@@ -164,10 +167,50 @@
             font-size: 1.1em;
             font-weight: 600;
         }
+        /* NEW: Thank You Overlay/Modal Style */
+        #thank-you-overlay {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(255, 255, 255, 0.95); 
+            z-index: 1000; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            flex-direction: column; 
+            padding: 20px;
+            display: none; /* ซ่อนไว้ตอนเริ่มต้น */
+        }
+        #thank-you-overlay h2 {
+            color: #4a148c; 
+            margin-top: 20px; 
+            font-size: 1.8em;
+            border-bottom: none;
+        }
+        #thank-you-overlay button {
+            background-color: #00b900; /* สีเขียว LINE */
+            margin-top: 20px;
+        }
+        #thank-you-image {
+            max-width: 80%; 
+            height: auto; 
+            max-height: 50vh;
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
 
+    <div id="thank-you-overlay">
+        <img id="thank-you-image" src="" alt="Thank You Image">
+        <h2 style="color: #4a148c; margin-top: 20px; font-size: 1.8em;">ขอบคุณสำหรับคำอวยพรครับ/ค่ะ! 🥳</h2>
+        <p style="font-size: 1.1em; color: #333; max-width: 400px; font-weight: 600;">คำอวยพรของคุณได้รับการบันทึกเรียบร้อยแล้ว หวังว่าคุณจะมีความสุขที่ได้เห็นมันบน Wall of Wishes นะครับ/คะ!</p>
+        <button onclick="liff.closeWindow()">✅ ปิดหน้าต่าง LIFF</button>
+    </div>
     <div class="container">
         <h1>🎓 Wall of Wishes 💌</h1>
         
@@ -215,6 +258,11 @@
         const apiEndpoint = `${apiBaseUrl}/wishes`; 
 
         let allWishes = []; // ข้อมูลจะถูกดึงมาเก็บที่นี่
+
+        // 🟢 NEW CONFIGURATION: สำหรับการสลับ Action หลังบันทึกและลิงก์สนับสนุน
+        const supportLink = 'https://liff.line.me/2008162847-GV9l2wmz';
+        // 🚨 เปลี่ยน URL นี้เป็นรูป PNG ขอบคุณของคุณ
+        const thankYouImageUrl = 'https://i.imgur.com/your-thank-you-image.png'; 
         // ** END CONFIGURATION **
 
         // DOM Elements
@@ -223,11 +271,13 @@
         const statusText = document.getElementById('form-status');
         const wishesDisplay = document.getElementById('wishes-display');
         const loginMessage = document.getElementById('login-message');
+        const overlay = document.getElementById('thank-you-overlay');
+        const formBlock = document.getElementById('blessing-form');
         
         const noteColors = ['#fff59d', '#80cbc4', '#ffab91', '#b39ddb', '#e6ee9c']; 
         
         // ===================================
-        // 🚀 LIFF Initialization
+        // 🚀 LIFF Initialization (เหมือนเดิม)
         // ===================================
 
         async function initializeLiff() {
@@ -256,22 +306,17 @@
         }
 
         // ===================================
-        // 🌐 API Call Functions
+        // 🌐 API Call Functions (ปรับปรุง saveBlessing)
         // ===================================
 
-        /** ดึงข้อมูลคำอวยพรทั้งหมดจาก Backend */
         async function fetchAndLoadWishes(defaultName) {
             try {
                 const response = await fetch(apiEndpoint);
                 if (!response.ok) throw new Error('Failed to fetch wishes from API');
-                
                 allWishes = await response.json();
-                
                 loadAndRenderWishes(defaultName);
-                
             } catch (error) {
                 console.error('Error fetching wishes:', error);
-                // แสดงข้อความผิดพลาดบนหน้าเว็บหากเรียก API ไม่สำเร็จ
                 statusText.textContent = '⚠️ ไม่สามารถโหลดคำอวยพรจากเซิร์ฟเวอร์ได้';
                 statusText.style.color = '#d32f2f';
                 wishesDisplay.innerHTML = '<p style="text-align: center; color: #757575;">ไม่สามารถแสดงคำอวยพรได้ในขณะนี้</p>';
@@ -303,7 +348,6 @@
 
             let currentUserWish = getCurrentUserWish();
             let method = currentUserWish ? 'PUT' : 'POST';
-            // สมมติว่า Backend ใช้ ID เป็น Parameter สำหรับการอัปเดต (PUT)
             let url = currentUserWish ? `${apiEndpoint}/${currentUserWish.id}` : apiEndpoint; 
 
             try {
@@ -314,12 +358,9 @@
                 });
 
                 if (response.ok) {
-                    statusText.textContent = `✅ ${method === 'POST' ? 'บันทึก' : 'แก้ไข'}คำอวยพรเรียบร้อยแล้ว`;
-                    statusText.style.color = '#4a148c';
+                    // 🟢 NEW: จัดการ Action หลังบันทึกสำเร็จ
+                    handlePostSaveAction(method);
                     
-                    // ดึงข้อมูลใหม่และเรนเดอร์ทั้งหมดหลังการบันทึกสำเร็จ
-                    const profile = await liff.getProfile();
-                    await fetchAndLoadWishes(profile.displayName); 
                 } else {
                     const errorData = await response.json().catch(() => ({ error: 'Unknown Server Error' }));
                     statusText.textContent = `❗ เกิดข้อผิดพลาด: ${errorData.error || 'Server Error'}`;
@@ -332,14 +373,14 @@
             }
         }
 
-        /** ลบคำอวยพรผ่าน Backend API (DELETE) */
+        /** ลบคำอวยพรผ่าน Backend API (DELETE) (เหมือนเดิม) */
         async function deleteBlessing() {
             if (!myUserId) return;
 
             let currentUserWish = getCurrentUserWish();
 
             if (currentUserWish) {
-                if (confirm('ยืนยันที่จะลบคำอวยพรของคุณหรือไม่?')) {
+                if (confirm('ยืนยันที่จะลบคำอวยพรของคุณหรือไม่? การลบนี้จะไม่ลบข้อมูลเงินสนับสนุนหากคุณเคยโอนเงินแล้ว')) {
                     try {
                         const response = await fetch(`${apiEndpoint}/${currentUserWish.id}`, {
                             method: 'DELETE'
@@ -351,7 +392,6 @@
                             statusText.textContent = '🗑️ ลบคำอวยพรเรียบร้อยแล้ว';
                             statusText.style.color = '#d32f2f';
 
-                            // ดึงข้อมูลใหม่และเรนเดอร์ทั้งหมดหลังการลบสำเร็จ
                             const profile = await liff.getProfile();
                             await fetchAndLoadWishes(profile.displayName); 
 
@@ -371,13 +411,80 @@
                 statusText.style.color = '#d32f2f';
             }
         }
+
+        // ===================================
+        // 🟢 NEW: Post-Save Action Logic (สลับ Action)
+        // ===================================
+
+        /** จัดการ Action หลังบันทึกสำเร็จ (สลับระหว่าง แสดงข้อความ/รูปภาพ กับ Redirect ไปหน้าสนับสนุน) */
+        function handlePostSaveAction(method) {
+            let saveCount = parseInt(localStorage.getItem('wishSaveCount') || '0');
+            saveCount++;
+            localStorage.setItem('wishSaveCount', saveCount);
+            
+            // สลับ Action: เลขคู่ (0, 2, 4...) = Show Thank You Modal. เลขคี่ (1, 3, 5...) = Redirect to Support Link.
+
+            if (saveCount % 2 === 0) { 
+                // Action 1: แสดงข้อความขอบคุณบนหน้าเดิม
+                statusText.textContent = `✅ ${method === 'POST' ? 'บันทึก' : 'แก้ไข'}คำอวยพรเรียบร้อยแล้ว`;
+                statusText.style.color = '#4a148c';
+
+                // 1. แสดง Modal/Overlay ขอบคุณ
+                showThankYouModal();
+
+                // 2. ดึงข้อมูลใหม่และเรนเดอร์ทั้งหมดหลังการบันทึกสำเร็จ (เพื่อให้การ์ดอัปเดต)
+                liff.getProfile().then(profile => {
+                    fetchAndLoadWishes(profile.displayName);
+                });
+
+            } else { 
+                // Action 2: Redirect ไปยังหน้าสนับสนุน
+                statusText.textContent = `✅ ${method === 'POST' ? 'บันทึก' : 'แก้ไข'}คำอวยพรเรียบร้อยแล้ว (กำลังเปลี่ยนหน้าไปหน้าสนับสนุน...)`;
+                statusText.style.color = '#7b1fa2';
+                
+                // 1. ดึงข้อมูลและเรนเดอร์เบื้องหลัง
+                liff.getProfile().then(profile => {
+                    fetchAndLoadWishes(profile.displayName);
+                });
+
+                // 2. รอ 1 วินาทีแล้ว Redirect
+                setTimeout(() => {
+                    if (liff.isInClient()) {
+                        liff.openWindow({
+                            url: supportLink,
+                            external: false // เปิดใน LIFF Tab เดิม
+                        });
+                    } else {
+                         // สำหรับกรณีทดสอบนอก LINE
+                        window.location.href = supportLink;
+                    }
+                }, 1000); 
+            }
+        }
+        
+        /** แสดง Modal ขอบคุณพร้อมรูปภาพ */
+        function showThankYouModal() {
+            const image = document.getElementById('thank-you-image');
+            
+            image.src = thankYouImageUrl;
+            overlay.style.display = 'flex'; // แสดง Modal
+
+            // ซ่อน/หรี่ UI หลักเพื่อเน้น Modal
+            formBlock.style.opacity = '0.2';
+            wishesDisplay.style.opacity = '0.2';
+        }
         
         // ===================================
-        // 🎨 UI/Rendering Logic
+        // 🎨 UI/Rendering Logic (เหมือนเดิม + แสดง Amount)
         // ===================================
 
         function loadAndRenderWishes(defaultName) {
             const userWish = getCurrentUserWish();
+
+            // รีเซ็ต opacity กรณีปิด Modal
+            overlay.style.display = 'none';
+            formBlock.style.opacity = '1';
+            wishesDisplay.style.opacity = '1';
 
             if (userWish) {
                 nameInput.value = userWish.name; 
@@ -396,7 +503,6 @@
         }
 
         function getCurrentUserWish() {
-            // สมมติว่า API คืนค่า object ที่มี key เป็น line_user_id
             return allWishes.find(wish => wish.line_user_id === myUserId);
         }
 
@@ -406,13 +512,12 @@
             const currentUserWish = getCurrentUserWish();
             let sortedWishes = [...allWishes].filter(wish => wish.line_user_id !== myUserId);
             if (currentUserWish) {
-                // นำคำอวยพรของผู้ใช้ปัจจุบันมาไว้ข้างหน้าสุด
                 sortedWishes.unshift(currentUserWish);
             }
 
             if (sortedWishes.length === 0) {
-                 wishesDisplay.innerHTML = '<p style="text-align: center; color: #757575; font-style: italic;">ยังไม่มีคำอวยพรในระบบเลย เขียนเป็นคนแรกสิ!</p>';
-                 return;
+                wishesDisplay.innerHTML = '<p style="text-align: center; color: #757575; font-style: italic;">ยังไม่มีคำอวยพรในระบบเลย เขียนเป็นคนแรกสิ!</p>';
+                return;
             }
 
             sortedWishes.forEach((wish, index) => {
@@ -422,7 +527,6 @@
                 let colorIndex = index % noteColors.length;
                 let cardColor = noteColors[colorIndex];
                 
-                // เน้นการ์ดของผู้ใช้ปัจจุบัน
                 if (wish.line_user_id === myUserId) { 
                     cardColor = '#a8e6cf'; 
                     card.style.fontWeight = '600'; 
@@ -434,8 +538,20 @@
                 card.style.setProperty('--random-rotation', `${randomRotation}deg`); 
                 card.style.animationDelay = `${index * 0.1}s`; 
 
+                // ส่วนการแสดงค่าเงินสนับสนุน
+                let amountDisplay = '';
+                if (wish.amount && Number(wish.amount) > 0) { 
+                    const formattedAmount = Number(wish.amount).toLocaleString('th-TH');
+                    amountDisplay = `
+                        <span class="amount" style="display: block; font-size: 1.2em; font-weight: 700; color: #4CAF50; margin-top: 10px; border-top: 1px dashed #cccccc; padding-top: 8px;">
+                            💰 ${formattedAmount} บาท
+                        </span>
+                    `;
+                }
+
                 card.innerHTML = `
                     <p>“${wish.message}”</p>
+                    ${amountDisplay}
                     <span class="author">
                         — ${wish.name} 
                         ${wish.line_user_id === myUserId ? ' (ของคุณ)' : ''}
@@ -446,7 +562,7 @@
         }
         
         // ===================================
-        // ⬇️ Main Entry Point
+        // ⬇️ Main Entry Point (เหมือนเดิม)
         // ===================================
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -460,10 +576,11 @@
                 document.getElementById('profile-picture').src = 'https://via.placeholder.com/50';
                 document.getElementById('profile-name').textContent = 'Test User (Mock)';
                 
-                // สร้าง Mock Data สำหรับเรนเดอร์
+                // สร้าง Mock Data สำหรับเรนเดอร์ (รวม amount)
                 allWishes = [
-                    { id: 1, line_user_id: 'Uother_id_1', name: 'คุณแม่', message: 'ลูกรัก! แม่ภูมิใจในตัวลูกที่สุดเลยนะ 💖' },
-                    { id: 99, line_user_id: myUserId, name: 'Test User (Mock)', message: 'นี่คือคำอวยพรจำลองของผู้ใช้ที่ล็อกอินอยู่' },
+                    { id: 1, line_user_id: 'Uother_id_1', name: 'คุณแม่', message: 'ลูกรัก! แม่ภูมิใจในตัวลูกที่สุดเลยนะ 💖', amount: 0 }, 
+                    { id: 2, line_user_id: 'Uother_id_2', name: 'เพื่อน A', message: 'ยินดีด้วยนะเพื่อน! เลี้ยงหน่อย!', amount: 1200 }, 
+                    { id: 99, line_user_id: myUserId, name: 'Test User (Mock)', message: 'นี่คือคำอวยพรจำลองของผู้ใช้ที่ล็อกอินอยู่', amount: 500 }, 
                 ];
                 loadAndRenderWishes('Test User (Mock)');
             }
@@ -471,4 +588,5 @@
 
     </script>
 </body>
+
 </html>
