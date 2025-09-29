@@ -27,18 +27,28 @@
             margin: 0;
             padding: 0;
             line-height: 1.6;
+            /* ปรับพื้นหลัง */
             background: linear-gradient(-45deg, #f7f9fc, #f0f4f8, #e0e7f1);
             background-size: 400% 400%;
             animation: moveBackground 30s ease infinite;
+            min-height: 100vh; /* เพิ่มความสูงขั้นต่ำ */
         }
         .container {
             max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
+            margin: 0 auto; /* จัดกึ่งกลาง */
+            padding: 20px 15px; /* เพิ่ม Padding ด้านข้างสำหรับมือถือ */
             background: #fff;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             border-radius: 12px;
-            position: relative; /* สำหรับซ้อน Modal */
+            position: relative;
+            min-height: 100vh;
+        }
+        @media (min-width: 600px) {
+            .container {
+                margin: 20px auto;
+                padding: 30px;
+                min-height: auto;
+            }
         }
         h1 {
             color: #4a148c;
@@ -121,7 +131,7 @@
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 30px 20px; 
             padding: 10px;
-            transition: opacity 0.3s; /* เพื่อให้จางลงเมื่อ Modal แสดง */
+            transition: opacity 0.3s;
         }
         .wish-card {
             padding: 20px;
@@ -148,8 +158,6 @@
             color: #4a148c; 
             font-weight: 700;
             margin-top: 10px;
-            font-size: 15px;
-            border-top: 1px dashed #cccccc;
             padding-top: 8px;
         }
         .liff-info {
@@ -167,88 +175,95 @@
             font-size: 1.1em;
             font-weight: 600;
         }
-        /* NEW: Thank You Overlay/Modal Style */
+        /* NEW: Thank You Overlay/Modal Style (ปรับปรุงให้จัดกึ่งกลางและมีพื้นที่) */
         #thank-you-overlay {
             position: fixed; 
             top: 0; 
             left: 0; 
             width: 100%; 
             height: 100%; 
-            background: rgba(0, 0, 0, 0.9); /* เปลี่ยนเป็นพื้นหลังทึบขึ้น */
+            background: rgba(0, 0, 0, 0.9);
             z-index: 1000; 
+            display: flex; /* ใช้ flexbox เพื่อจัดกึ่งกลาง */
             justify-content: center; 
             align-items: center; 
             text-align: center; 
-            flex-direction: column; 
             padding: 20px;
             display: none; /* ซ่อนไว้ตอนเริ่มต้น */
+            overflow-y: auto; /* เพิ่ม scrollbar ถ้าเนื้อหาเยอะ */
         }
-        .modal-content-box { /* เพิ่มกล่อง Modal */
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 90%;
-            width: 400px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        }
+        .modal-content-box { /* เพิ่มกล่อง Modal */
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transform: scale(1);
+            animation: fadeIn 0.3s ease-out; /* เพิ่มอนิเมชันเปิด */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
         #thank-you-overlay h2 {
             color: #4a148c; 
             margin-top: 20px; 
             font-size: 1.8em;
             border-bottom: none;
         }
-        #support-cta-btn {
-            background-color: #4CAF50; /* เขียว */
-            color: white;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-weight: 700;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            width: 100%;
-        }
-        #support-cta-btn:hover {
-            background-color: #43a047;
-            transform: scale(1.02);
-        }
+        #support-cta-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        #support-cta-btn:hover {
+            background-color: #43a047;
+            transform: scale(1.02);
+        }
         #thank-you-image {
-            width: 120px; /* ปรับขนาดให้เป็นวงกลม */
-            height: 120px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%; 
             object-fit: cover;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             border: 5px solid #ffc107;
         }
-        /* สไตล์สำหรับปุ่มปิดใน Modal */
-        .close-modal-btn { 
-            background: none !important;
-            color: #7b1fa2 !important;
-            border: none;
-            padding: 5px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: block;
-            width: 100%;
-            margin: 0 !important;
-        }
-        .close-modal-btn:hover {
-            text-decoration: underline;
-        }
+        /* สไตล์สำหรับปุ่มปิดใน Modal */
+        .close-modal-btn { 
+            background: none !important;
+            color: #7b1fa2 !important;
+            border: none;
+            padding: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin: 0 !important;
+        }
+        .close-modal-btn:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
     <div id="thank-you-overlay">
-        <div class="modal-content-box">
-            <img id="thank-you-image" src="" alt="Profile Picture">
-            <h2 style="color: #4a148c; margin-top: 20px; font-size: 1.8em;">ขอบคุณสำหรับคำอวยพรสุดพิเศษ! 🙏</h2>
-            <p style="font-size: 1.1em; color: #333; font-weight: 400;">คำอวยพรของคุณได้รับการบันทึกบน Wall of Wishes เรียบร้อยแล้ว ผมซาบซึ้งใจมากๆ เลยครับ/ค่ะ!</p>
-            <p style="font-weight: 700; color: #4a148c; margin-top: 15px;">หากท่านต้องการสนับสนุนค่าใช้จ่ายเพิ่มเติม...</p>
-            <button id="support-cta-btn">🎁 สนับสนุนเป็นพิเศษ (โอนเงิน)</button>
-            <button onclick="liff.closeWindow()" class="close-modal-btn">✅ ปิดหน้าต่าง LIFF</button>
-        </div>
+        <div class="modal-content-box">
+            <img id="thank-you-image" src="" alt="รูปภาพขอบคุณ">
+            <h2 style="color: #4a148c; margin-top: 20px; font-size: 1.8em;">ขอบคุณสำหรับคำอวยพรสุดพิเศษ! 🙏</h2>
+            <p style="font-size: 1.1em; color: #333; font-weight: 400;">คำอวยพรของคุณได้รับการบันทึกบน Wall of Wishes เรียบร้อยแล้ว ผมซาบซึ้งใจมากๆ เลยครับ/ค่ะ!</p>
+            <p style="font-weight: 700; color: #4a148c; margin-top: 15px;">หากท่านต้องการสนับสนุนค่าใช้จ่ายเพิ่มเติม...</p>
+            <button id="support-cta-btn">🎁 สนับสนุนเป็นพิเศษ (โอนเงิน)</button>
+            <button onclick="liff.closeWindow()" class="close-modal-btn">✅ ปิดหน้าต่าง LIFF</button>
+        </div>
     </div>
-    
+    
     <div class="container">
         <h1>🎓 Wall of Wishes 💌</h1>
         
@@ -300,7 +315,8 @@
         // 🟢 NEW CONFIGURATION: สำหรับลิงก์สนับสนุนและรูปภาพ
         const supportLink = 'https://liff.line.me/2008162847-GV9l2wmz';
         // 🚨 ใช้ชื่อไฟล์ภาพที่คุณอัปโหลดไว้ในโฟลเดอร์เดียวกัน
-        const thankYouImageUrl = '.ขอบคุณ.png'; 
+        // ผมเปลี่ยนเป็น /ขอบคุณ.png เพื่อให้มั่นใจว่าไฟล์ถูกเรียกอย่างถูกต้อง
+        const thankYouImageUrl = '/ขอบคุณ.png'; 
         // ** END CONFIGURATION **
 
         // DOM Elements
@@ -396,7 +412,7 @@
                 });
 
                 if (response.ok) {
-                    // 🟢 NEW: จัดการ Action หลังบันทึกสำเร็จ (แสดง Modal เสมอ)
+                    // 🟢 จัดการ Action หลังบันทึกสำเร็จ (แสดง Modal เสมอ)
                     handlePostSaveAction(method);
                     
                 } else {
@@ -411,14 +427,14 @@
             }
         }
 
-        /** ลบคำอวยพรผ่าน Backend API (DELETE) (เหมือนเดิม) */
+        /** ลบคำอวยพรผ่าน Backend API (DELETE) */
         async function deleteBlessing() {
             if (!myUserId) return;
 
             let currentUserWish = getCurrentUserWish();
 
             if (currentUserWish) {
-                if (confirm('ยืนยันที่จะลบคำอวยพรของคุณหรือไม่? การลบนี้จะไม่ลบข้อมูลเงินสนับสนุนหากคุณเคยโอนเงินแล้ว')) {
+                if (confirm('ยืนยันที่จะลบคำอวยพรของคุณหรือไม่?')) {
                     try {
                         const response = await fetch(`${apiEndpoint}/${currentUserWish.id}`, {
                             method: 'DELETE'
@@ -451,54 +467,54 @@
         }
 
         // ===================================
-        // 🟢 NEW: Post-Save Action Logic (แสดง Modal ขอบคุณเสมอ)
+        // 🟢 Post-Save Action Logic
         // ===================================
 
         /** แสดง Modal ขอบคุณพร้อมรูปภาพ และตั้งค่าปุ่ม CTA */
         function showThankYouModal() {
             const image = document.getElementById('thank-you-image');
-            const supportBtn = document.getElementById('support-cta-btn'); // ปุ่ม CTA
+            const supportBtn = document.getElementById('support-cta-btn'); // ปุ่ม CTA
             
             // 1. ตั้งค่ารูปภาพ
             image.src = thankYouImageUrl;
-            
-            // 2. ตั้งค่าปุ่ม CTA ให้ Redirect ไปยังลิงก์สนับสนุน
-            supportBtn.onclick = () => {
-                if (liff.isInClient()) {
-                    liff.openWindow({
-                        url: supportLink,
-                        external: false // เปิดใน LIFF Tab เดิม
-                    });
-                } else {
-                    window.open(supportLink, '_blank');
-                }
-            };
-            
+            
+            // 2. ตั้งค่าปุ่ม CTA ให้ Redirect ไปยังลิงก์สนับสนุน
+            supportBtn.onclick = () => {
+                if (liff.isInClient()) {
+                    liff.openWindow({
+                        url: supportLink,
+                        external: false // เปิดใน LIFF Tab เดิม
+                    });
+                } else {
+                    window.open(supportLink, '_blank');
+                }
+            };
+            
             // 3. แสดง Modal
-            overlay.style.display = 'flex'; 
+            overlay.style.display = 'flex'; 
 
             // 4. ซ่อน/หรี่ UI หลักเพื่อเน้น Modal
             formBlock.style.opacity = '0.2';
             wishesDisplay.style.opacity = '0.2';
         }
-        
-        /** จัดการ Action หลังบันทึกสำเร็จ (แสดง Modal ขอบคุณเสมอ) */
-        function handlePostSaveAction(method) {
-            // 1. อัปเดตสถานะในฟอร์ม
-            statusText.textContent = `✅ ${method === 'POST' ? 'บันทึก' : 'แก้ไข'}คำอวยพรเรียบร้อยแล้ว`;
-            statusText.style.color = '#4a148c';
+        
+        /** จัดการ Action หลังบันทึกสำเร็จ (แสดง Modal ขอบคุณเสมอ) */
+        function handlePostSaveAction(method) {
+            // 1. อัปเดตสถานะในฟอร์ม
+            statusText.textContent = `✅ ${method === 'POST' ? 'บันทึก' : 'แก้ไข'}คำอวยพรเรียบร้อยแล้ว`;
+            statusText.style.color = '#4a148c';
 
-            // 2. แสดง Modal ขอบคุณ (พร้อมปุ่ม CTA)
-            showThankYouModal();
+            // 2. แสดง Modal ขอบคุณ (พร้อมปุ่ม CTA)
+            showThankYouModal();
 
-            // 3. ดึงข้อมูลใหม่และเรนเดอร์ทั้งหมดหลังการบันทึกสำเร็จ (เพื่อให้การ์ดอัปเดต)
-            liff.getProfile().then(profile => {
-                fetchAndLoadWishes(profile.displayName);
-            });
-        }
+            // 3. ดึงข้อมูลใหม่และเรนเดอร์ทั้งหมดหลังการบันทึกสำเร็จ (เพื่อให้การ์ดอัปเดต)
+            liff.getProfile().then(profile => {
+                fetchAndLoadWishes(profile.displayName);
+            });
+        }
         
         // ===================================
-        // 🎨 UI/Rendering Logic (เหมือนเดิม + แสดง Amount)
+        // 🎨 UI/Rendering Logic
         // ===================================
 
         function loadAndRenderWishes(defaultName) {
@@ -575,7 +591,7 @@
                 card.innerHTML = `
                     <p>“${wish.message}”</p>
                     ${amountDisplay}
-                    <span class="author">
+                    <span class="author" style="${amountDisplay ? '' : 'border-top: 1px dashed #cccccc; padding-top: 8px;'}">
                         — ${wish.name} 
                         ${wish.line_user_id === myUserId ? ' (ของคุณ)' : ''}
                     </span>
@@ -613,4 +629,3 @@
 </body>
 
 </html>
-
