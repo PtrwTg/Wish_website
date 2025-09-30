@@ -26,279 +26,357 @@
             color: #333;
             margin: 0;
             padding: 0;
-            min-height: 100vh;
-            background: linear-gradient(-45deg, #FFDEE9, #B5FFFC, #C3E6CB, #F7C3C5);
+            line-height: 1.6;
+            background: linear-gradient(-45deg, #f7f9fc, #f0f4f8, #e0e7f1);
             background-size: 400% 400%;
             animation: moveBackground 30s ease infinite;
         }
-
-        #container {
-            max-width: 1200px;
-            margin: 0 auto;
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
             padding: 20px;
+            background: #fff;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
         }
-
-        header {
+        h1 {
+            color: #4a148c;
             text-align: center;
-            padding: 20px 0;
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            border-radius: 10px;
+            font-weight: 700;
+            border-bottom: 3px solid #ffd54f;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
         }
-
-        header h1 {
-            color: #7b1fa2; /* Deep Purple */
-            margin: 0;
-            font-size: 2em;
+        h2 {
+            color: #7b1fa2;
+            margin-top: 30px;
+            font-weight: 600;
         }
-
+        /* LIFF Profile Display */
         #profile-info-display {
-            display: none;
+            display: none; 
             align-items: center;
-            justify-content: center;
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #e8eaf6;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f3e5f5;
             border-radius: 8px;
         }
-
         #profile-picture {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            margin-right: 10px;
-            border: 2px solid #5e35b1;
+            margin-right: 15px;
+            border: 2px solid #7b1fa2;
         }
-
         #profile-name {
-            font-weight: 600;
-            color: #5e35b1;
-        }
-
-        /* Form Area */
-        #blessing-form {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            margin-bottom: 30px;
-            border-left: 5px solid #ff4081; /* Pink Accent */
-        }
-
-        #blessing-form label,
-        #blessing-form input,
-        #blessing-form textarea,
-        #blessing-form button {
-            display: block;
-            width: calc(100% - 20px);
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-family: 'Sarabun', sans-serif;
-        }
-        
-        #blessing-form input, #blessing-form textarea {
-            font-size: 1em;
-        }
-
-        #blessing-form textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        #blessing-form button {
-            background-color: #ff4081; /* Pink */
-            color: white;
             font-weight: 700;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.3s;
+            color: #4a148c;
+            font-size: 1.1em;
         }
-
-        #blessing-form button:hover {
-            background-color: #e91e63;
+        /* FORM SECTION */
+        #blessing-form {
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 30px;
         }
-
-        #status-text {
-            text-align: center;
+        label {
+            display: block;
+            margin-bottom: 8px;
             font-weight: 600;
-            color: #7b1fa2;
-            margin-bottom: 15px;
+            color: #4a148c;
         }
-
-        /* Wishes Wall */
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 16px;
+        }
+        textarea { resize: vertical; height: 120px; }
+        button {
+            background-color: #4a148c;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+        button:hover { background-color: #7b1fa2; }
+        #delete-btn { background-color: #e57373; }
+        #delete-btn:hover { background-color: #d32f2f; }
+        
+        /* WALL OF WISHES SECTION (GALLERY) */
         #wishes-display {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            padding-bottom: 50px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px 20px; 
+            padding: 10px;
         }
-
         .wish-card {
-            background-color: #fff3e0;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-            position: relative;
-            transform: rotate(var(--random-rotation));
-            transition: transform 0.3s ease-out;
-            animation: popIn 0.5s ease-out forwards;
-            opacity: 0;
-            height: 200px; /* Fixed height for consistency */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            padding: 20px;
+            border-radius: 4px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            opacity: 0; 
+            animation: popIn 0.5s ease-out forwards; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
         }
-
-        .current-user-wish {
-            box-shadow: 0 0 15px rgba(255, 64, 129, 0.8), 2px 2px 5px rgba(0, 0, 0, 0.2);
-            border: 3px solid #ff4081;
+        .wish-card:hover {
+            transform: scale(1.03) translateY(-3px) rotate(var(--random-rotation));
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
-        
         .wish-card p {
-            font-style: italic;
-            font-weight: 400;
-            margin-top: 0;
-            flex-grow: 1;
-            overflow-y: auto; /* For long messages */
+            font-size: 16px;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            text-shadow: 0.5px 0.5px 0.5px rgba(0, 0, 0, 0.1); 
         }
-
         .wish-card .author {
             display: block;
             text-align: right;
-            font-weight: 600;
-            color: #444;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            padding-top: 5px;
-            margin-top: 5px;
+            font-style: normal;
+            color: #4a148c; 
+            font-weight: 700;
+            margin-top: 10px;
+            font-size: 15px;
+            border-top: 1px dashed #cccccc;
+            padding-top: 8px;
         }
-
-        .no-wishes {
-            grid-column: 1 / -1;
+        .liff-info {
             text-align: center;
-            font-size: 1.2em;
-            color: #7b1fa2;
-            padding: 50px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #ffe0b2;
+            border-radius: 5px;
+            color: #e65100;
+            font-weight: 600;
+        }
+        #login-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-    <div id="container">
-        <header>
-            <h1>💌 Wall of Wishes</h1>
-            <p>ร่วมเขียนคำอวยพรและกำลังใจ</p>
-            <div id="login-message" style="color: #ff4081; font-weight: 600;">กำลังโหลด LIFF...</div>
-            <div id="profile-info-display">
-                <img id="profile-picture" alt="Profile Picture">
-                <span id="profile-name"></span>
-            </div>
-        </header>
 
-        <div id="blessing-form">
-            <h2>เขียนคำอวยพรของคุณ</h2>
-            <div id="status-text"></div>
-            
-            <label for="name">ชื่อของคุณ:</label>
-            <input type="text" id="name" placeholder="ชื่อที่ต้องการแสดง">
-            
-            <label for="message">คำอวยพร:</label>
-            <textarea id="message" placeholder="กรอกข้อความอวยพรของคุณ"></textarea>
-
-            <button onclick="saveBlessing()">บันทึก/แก้ไข</button>
-            <button onclick="deleteBlessing()" id="delete-button" style="background-color: #f44336; display: none;">ลบคำอวยพร</button>
+    <div class="container">
+        <h1>🎓 Wall of Wishes 💌</h1>
+        
+        <div class="liff-info" id="login-message">
+            กำลังเชื่อมต่อกับ LINE LIFF...
         </div>
 
-        <h2>กระดานคำอวยพรทั้งหมด</h2>
+        <h2>✨ คำอวยพรจากทุกท่าน</h2>
         <div id="wishes-display">
             </div>
+
+        <hr style="border: 0; border-top: 1px solid #ccc; margin: 30px 0;">
+        
+        <h2>📝 คำอวยพรของคุณ</h2>
+        
+        <div id="profile-info-display">
+            <img id="profile-picture" src="" alt="Profile Picture">
+            <span>ล็อกอินด้วย: <span id="profile-name"></span></span>
+        </div>
+
+        <div id="blessing-form">
+            <input type="hidden" id="line-id-hidden" value="">
+            
+            <label for="name">ชื่อผู้ส่ง (คุณสามารถตั้งชื่อใหม่ได้):</label>
+            <input type="text" id="name" placeholder="เช่น พี่/น้อง/เพื่อน/คุณครู/ชื่อเล่น" required>
+
+            <label for="message">คำอวยพร:</label>
+            <textarea id="message" placeholder="เขียนคำอวยพรแสดงความยินดีได้ที่นี่..." required></textarea>
+
+            <button onclick="saveBlessing()">บันทึก/แก้ไข</button>
+            <button id="delete-btn" onclick="deleteBlessing()">ลบคำอวยพร</button>
+
+            <p id="form-status" style="margin-top: 15px; font-weight: 600; color: #4a148c;"></p>
+        </div>
 
     </div>
 
     <script>
-        // ===================================
-        // ⚙️ Global Variables
-        // ===================================
-        
-        // 🚨 แก้ไข URL นี้เป็น Backend Server ของคุณ (เช่น https://your-server.onrender.com/wishes)
-        const apiEndpoint = 'http://localhost:5000/wishes'; 
-        let myUserId = null;
-        let allWishes = [];
-        const colors = ['#f44336', '#ffc107', '#4caf50', '#2196f3', '#9c27b0', '#ff9800']; // Post-it colors
+        // ** CONFIGURATION **
+        const liffId = '2008162847-a7gLZonM'; 
+        let myUserId = ''; 
 
+        // 🚨 IMPORTANT: ต้องเปลี่ยน URL นี้ให้ตรงกับ Backend (FN) ของคุณ
+        const apiBaseUrl = 'https://wish-website-be.onrender.com';
+        const apiEndpoint = `${apiBaseUrl}/wishes`; 
+
+        let allWishes = []; // ข้อมูลจะถูกดึงมาเก็บที่นี่
+        // ** END CONFIGURATION **
+
+        // DOM Elements
         const nameInput = document.getElementById('name');
         const messageInput = document.getElementById('message');
-        const statusText = document.getElementById('status-text');
-        const deleteButton = document.getElementById('delete-button');
+        const statusText = document.getElementById('form-status');
+        const wishesDisplay = document.getElementById('wishes-display');
         const loginMessage = document.getElementById('login-message');
-
+        
+        const noteColors = ['#fff59d', '#80cbc4', '#ffab91', '#b39ddb', '#e6ee9c']; 
+        
         // ===================================
-        // 🧑‍💻 LIFF Initialization
+        // 🚀 LIFF Initialization
         // ===================================
 
-        function initializeLiff() {
-            liff.init({
-                liffId: 'YOUR_LIFF_ID' // 🚨 ใส่ LIFF ID ของคุณ
-            })
-            .then(() => {
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId: liffId });
+                loginMessage.textContent = 'เชื่อมต่อ LIFF สำเร็จ...';
+
                 if (!liff.isLoggedIn()) {
-                    loginMessage.innerHTML = '⚠️ โปรดเข้าสู่ระบบ LINE เพื่อเขียนคำอวยพร';
+                    loginMessage.textContent = 'กำลังเปลี่ยนไปหน้าล็อกอิน...';
                     liff.login();
                 } else {
-                    getLiffData();
+                    const profile = await liff.getProfile();
+                    myUserId = profile.userId; 
+
+                    document.getElementById('profile-picture').src = profile.pictureUrl || 'https://via.placeholder.com/50'; 
+                    document.getElementById('profile-name').textContent = profile.displayName;
+                    document.getElementById('profile-info-display').style.display = 'flex';
+                    loginMessage.style.display = 'none';
+
+                    await fetchAndLoadWishes(profile.displayName);
                 }
-            })
-            .catch((err) => {
-                loginMessage.innerHTML = `<p style="color:red;">❌ LIFF Initialization failed: ${err.message}</p>`;
-                console.error('LIFF Init failed', err);
-            });
-        }
-
-        function getLiffData() {
-            liff.getProfile()
-            .then(profile => {
-                myUserId = profile.userId;
-                
-                // แสดงข้อมูล Profile
-                document.getElementById('profile-info-display').style.display = 'flex';
-                document.getElementById('profile-picture').src = profile.pictureUrl || 'https://via.placeholder.com/50';
-                document.getElementById('profile-name').textContent = profile.displayName;
-                loginMessage.style.display = 'none';
-
-                fetchAndLoadWishes(profile.displayName);
-            })
-            .catch(err => {
-                console.error('Error getting profile', err);
-            });
+            } catch (err) {
+                console.error('LIFF initialization failed', err);
+                loginMessage.innerHTML = '<p>❌ เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF กรุณาลองเปิดในแอป LINE</p>';
+            }
         }
 
         // ===================================
-        // 🔄 Utility & Data Fetching
+        // 🌐 API Call Functions
         // ===================================
-        
-        // ค้นหาคำอวยพรของผู้ใช้ปัจจุบันใน allWishes
-        function getCurrentUserWish() {
-            if (!myUserId || !allWishes) return null;
-            return allWishes.find(wish => wish.line_user_id === myUserId);
-        }
 
-        // ดึงข้อมูลคำอวยพรทั้งหมดจาก API และอัพเดต UI
+        /** ดึงข้อมูลคำอวยพรทั้งหมดจาก Backend */
         async function fetchAndLoadWishes(defaultName) {
             try {
                 const response = await fetch(apiEndpoint);
-                if (!response.ok) throw new Error('API failed to fetch wishes');
-
+                if (!response.ok) throw new Error('Failed to fetch wishes from API');
+                
                 allWishes = await response.json();
+                
                 loadAndRenderWishes(defaultName);
+                
             } catch (error) {
                 console.error('Error fetching wishes:', error);
-                statusText.textContent = '❌ ดึงคำอวยพรไม่สำเร็จ โปรดตรวจสอบ API Endpoint';
-                statusText.style.color = '#f44336';
+                // แสดงข้อความผิดพลาดบนหน้าเว็บหากเรียก API ไม่สำเร็จ
+                statusText.textContent = '⚠️ ไม่สามารถโหลดคำอวยพรจากเซิร์ฟเวอร์ได้';
+                statusText.style.color = '#d32f2f';
+                wishesDisplay.innerHTML = '<p style="text-align: center; color: #757575;">ไม่สามารถแสดงคำอวยพรได้ในขณะนี้</p>';
+            }
+        }
+
+        /** บันทึก/แก้ไขคำอวยพรผ่าน Backend API (POST/PUT) */
+        async function saveBlessing() {
+            if (!myUserId) {
+                alert('กรุณาล็อกอินด้วย LINE ก่อนบันทึก');
+                liff.login();
+                return;
+            }
+
+            const name = nameInput.value.trim();
+            const message = messageInput.value.trim();
+
+            if (!name || !message) {
+                statusText.textContent = '❗ กรุณากรอกชื่อและคำอวยพรให้ครบถ้วน';
+                statusText.style.color = '#d32f2f';
+                return;
+            }
+
+            const wishData = {
+                line_user_id: myUserId, 
+                name: name,
+                message: message
+                // 🚨 ไม่ส่ง amount: รักษานโยบายที่ว่า Admin จัดการใน Backend เท่านั้น
+            };
+
+            let currentUserWish = getCurrentUserWish();
+            let method = currentUserWish ? 'PUT' : 'POST';
+            // สมมติว่า Backend ใช้ ID เป็น Parameter สำหรับการอัปเดต (PUT)
+            let url = currentUserWish ? `${apiEndpoint}/${currentUserWish.id}` : apiEndpoint; 
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(wishData)
+                });
+
+                if (response.ok) {
+                    statusText.textContent = `✅ ${method === 'POST' ? 'บันทึก' : 'แก้ไข'}คำอวยพรเรียบร้อยแล้ว`;
+                    statusText.style.color = '#4a148c';
+                    
+                    // ดึงข้อมูลใหม่และเรนเดอร์ทั้งหมดหลังการบันทึกสำเร็จ
+                    const profile = await liff.getProfile();
+                    await fetchAndLoadWishes(profile.displayName); 
+                } else {
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown Server Error' }));
+                    statusText.textContent = `❗ เกิดข้อผิดพลาด: ${errorData.error || 'Server Error'}`;
+                    statusText.style.color = '#d32f2f';
+                }
+            } catch (error) {
+                console.error('Error submitting data:', error);
+                statusText.textContent = '❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ Backend ได้';
+                statusText.style.color = '#d32f2f';
+            }
+        }
+
+        /** ลบคำอวยพรผ่าน Backend API (DELETE) */
+        async function deleteBlessing() {
+            if (!myUserId) return;
+
+            let currentUserWish = getCurrentUserWish();
+
+            if (currentUserWish) {
+                if (confirm('ยืนยันที่จะลบคำอวยพรของคุณหรือไม่?')) {
+                    try {
+                        const response = await fetch(`${apiEndpoint}/${currentUserWish.id}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            nameInput.value = document.getElementById('profile-name').textContent || ''; 
+                            messageInput.value = ''; 
+                            statusText.textContent = '🗑️ ลบคำอวยพรเรียบร้อยแล้ว';
+                            statusText.style.color = '#d32f2f';
+
+                            // ดึงข้อมูลใหม่และเรนเดอร์ทั้งหมดหลังการลบสำเร็จ
+                            const profile = await liff.getProfile();
+                            await fetchAndLoadWishes(profile.displayName); 
+
+                        } else {
+                            const errorData = await response.json().catch(() => ({ error: 'Unknown Server Error' }));
+                            statusText.textContent = `❗ เกิดข้อผิดพลาดในการลบ: ${errorData.error || 'Server Error'}`;
+                            statusText.style.color = '#d32f2f';
+                        }
+                    } catch (error) {
+                        console.error('Error deleting wish:', error);
+                        statusText.textContent = '❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ Backend ได้';
+                        statusText.style.color = '#d32f2f';
+                    }
+                }
+            } else {
+                statusText.textContent = '❗ ไม่มีคำอวยพรของคุณที่จะลบ';
+                statusText.style.color = '#d32f2f';
             }
         }
         
-        // โหลดข้อมูลเข้าฟอร์ม (ถ้าเคยเขียนแล้ว) และเรนเดอร์ทั้งหมด
+        // ===================================
+        // 🎨 UI/Rendering Logic (มีการแก้ไขใน renderWishes)
+        // ===================================
+
         function loadAndRenderWishes(defaultName) {
             const userWish = getCurrentUserWish();
 
@@ -307,162 +385,69 @@
                 messageInput.value = userWish.message;
                 statusText.textContent = '💡 คุณเคยเขียนคำอวยพรแล้ว สามารถแก้ไขได้เลย';
                 statusText.style.color = '#7b1fa2';
-                deleteButton.style.display = 'block';
             } else {
                 nameInput.value = defaultName || ''; 
                 messageInput.value = '';
                 statusText.textContent = '✨ คุณยังไม่ได้เขียนคำอวยพรเลย เขียนเลยสิ!';
                 statusText.style.color = '#7b1fa2';
-                deleteButton.style.display = 'none';
             }
             
+            document.getElementById('line-id-hidden').value = myUserId; 
             renderWishes();
         }
 
-        // ===================================
-        // ✍️ Save/Delete Logic
-        // ===================================
-
-        async function saveBlessing() {
-            if (!myUserId) {
-                alert('โปรดเข้าสู่ระบบ LINE ก่อน');
-                return;
-            }
-
-            const name = nameInput.value.trim();
-            const message = messageInput.value.trim();
-
-            if (!name || !message) {
-                alert('โปรดกรอกชื่อและข้อความให้ครบถ้วน');
-                return;
-            }
-
-            const wishData = {
-                line_user_id: myUserId, 
-                name: name,
-                message: message,
-                // 🚨 ไม่ส่ง amount เพราะ Admin จัดการเอง
-            };
-            
-            let currentUserWish = getCurrentUserWish();
-            let method = currentUserWish ? 'PUT' : 'POST';
-            let url = currentUserWish ? `${apiEndpoint}/${currentUserWish.id}` : apiEndpoint; 
-
-            statusText.textContent = 'กำลังบันทึก...';
-            statusText.style.color = '#ff9800';
-
-            try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(wishData)
-                });
-                
-                const result = await response.json();
-
-                if (response.ok) {
-                    // อัพเดตข้อมูลทั้งหมดและเรนเดอร์ใหม่
-                    await fetchAndLoadWishes();
-                    statusText.textContent = '✅ บันทึกคำอวยพรสำเร็จแล้ว!';
-                    statusText.style.color = '#4caf50';
-                } else if (response.status === 409) {
-                    alert('คุณเคยเขียนคำอวยพรแล้ว โปรดใช้ปุ่ม "แก้ไข"');
-                    fetchAndLoadWishes(); // รีเฟรชข้อมูลเผื่อมีการ์ดซ้ำ
-                } else {
-                    throw new Error(result.error || 'Unknown error');
-                }
-
-            } catch (error) {
-                console.error('Error saving blessing:', error);
-                statusText.textContent = `❌ บันทึกไม่สำเร็จ: ${error.message}`;
-                statusText.style.color = '#f44336';
-            }
+        function getCurrentUserWish() {
+            // สมมติว่า API คืนค่า object ที่มี key เป็น line_user_id
+            return allWishes.find(wish => wish.line_user_id === myUserId);
         }
 
-        async function deleteBlessing() {
-            const userWish = getCurrentUserWish();
-            if (!userWish) return;
-
-            if (!confirm('คุณแน่ใจหรือไม่ว่าต้องการลบคำอวยพรนี้?')) return;
-
-            statusText.textContent = 'กำลังลบ...';
-            statusText.style.color = '#f44336';
-
-            try {
-                const response = await fetch(`${apiEndpoint}/${userWish.id}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    // ลบการ์ดออกจาก allWishes
-                    allWishes = allWishes.filter(w => w.id !== userWish.id);
-                    loadAndRenderWishes(nameInput.value);
-                    statusText.textContent = '🗑️ ลบคำอวยพรสำเร็จแล้ว';
-                    statusText.style.color = '#f44336';
-                } else {
-                    const result = await response.json();
-                    throw new Error(result.error || 'Unknown error');
-                }
-            } catch (error) {
-                console.error('Error deleting blessing:', error);
-                statusText.textContent = `❌ ลบไม่สำเร็จ: ${error.message}`;
-            }
-        }
-
-        // ===================================
-        // 🎨 Rendering
-        // ===================================
-
-        // 6. ฟังก์ชันแสดงคำอวยพรทั้งหมดบนหน้าจอ
         function renderWishes() {
-            const wishesDisplay = document.getElementById('wishes-display');
-            wishesDisplay.innerHTML = '';
+            wishesDisplay.innerHTML = ''; 
             
-            if (allWishes.length === 0) {
-                wishesDisplay.innerHTML = '<p class="no-wishes">ยังไม่มีคำอวยพรเลย</p>';
-                return;
+            const currentUserWish = getCurrentUserWish();
+            let sortedWishes = [...allWishes].filter(wish => wish.line_user_id !== myUserId);
+            if (currentUserWish) {
+                // นำคำอวยพรของผู้ใช้ปัจจุบันมาไว้ข้างหน้าสุด
+                sortedWishes.unshift(currentUserWish);
             }
 
-            // จัดเรียง: นำคำอวยพรของผู้ใช้ปัจจุบันมาไว้หน้าสุด
-            const sortedWishes = allWishes.sort((a, b) => {
-                if (a.line_user_id === myUserId && b.line_user_id !== myUserId) return -1;
-                if (a.line_user_id !== myUserId && b.line_user_id === myUserId) return 1;
-                return 0;
-            });
+            if (sortedWishes.length === 0) {
+                 wishesDisplay.innerHTML = '<p style="text-align: center; color: #757575; font-style: italic;">ยังไม่มีคำอวยพรในระบบเลย เขียนเป็นคนแรกสิ!</p>';
+                 return;
+            }
 
             sortedWishes.forEach((wish, index) => {
                 const card = document.createElement('div');
                 card.className = 'wish-card';
+
+                let colorIndex = index % noteColors.length;
+                let cardColor = noteColors[colorIndex];
                 
-                // สุ่มสี (color) และองศาการหมุน (rotation)
-                const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                const randomRotation = Math.random() * 6 - 3; // หมุน -3 ถึง 3 องศา
-
-                card.style.backgroundColor = randomColor;
-                card.style.setProperty('--random-rotation', `${randomRotation}deg`);
-                card.style.animationDelay = `${index * 0.05}s`;
-                card.classList.add('pop-in-animation');
-
                 // เน้นการ์ดของผู้ใช้ปัจจุบัน
-                if (wish.line_user_id === myUserId) {
-                    card.style.zIndex = 10;
-                    card.classList.add('current-user-wish'); 
+                if (wish.line_user_id === myUserId) { 
+                    cardColor = '#a8e6cf'; 
+                    card.style.fontWeight = '600'; 
                 }
+                card.style.backgroundColor = cardColor;
+                
+                let randomRotation = (Math.random() * 6) - 3; 
+                
+                card.style.setProperty('--random-rotation', `${randomRotation}deg`); 
+                card.style.animationDelay = `${index * 0.1}s`; 
 
                 // ----------------------------------------------------
                 // 🎁 NEW: Logic การแสดงมูลค่า (Amount)
                 let amountText = '';
                 // แปลงค่าจาก DB เป็นตัวเลข (NUMERIC) และใช้ 0 เป็นค่าเริ่มต้น
-                // ใช้ parseFloat เพื่อรองรับ NUMERIC(10, 2)
                 const amountValue = parseFloat(wish.amount) || 0; 
                 
                 if (amountValue > 0) {
-                    // จัดรูปแบบตัวเลขให้อ่านง่าย เช่น 10000 -> 10,000
+                    // จัดรูปแบบตัวเลขให้อ่านง่าย เช่น 5000 -> 5,000.00
                     const formattedAmount = amountValue.toLocaleString('th-TH', { 
                         minimumFractionDigits: 0, 
                         maximumFractionDigits: 2 
                     });
-                    // เพิ่มสไตล์สำหรับมูลค่า
+                    // เพิ่มสไตล์สำหรับมูลค่า (ใช้สีที่โดดเด่นแต่เข้ากับโทนม่วง/แดงเดิม)
                     amountText = `<span style="color: #c51162; font-weight: 700; margin-left: 10px;">🎁 ${formattedAmount} บาท</span>`;
                 }
                 // ----------------------------------------------------
@@ -472,14 +457,14 @@
                     <span class="author">
                         — ${wish.name} 
                         ${wish.line_user_id === myUserId ? ' (ของคุณ)' : ''}
-                        ${amountText}  </span>
+                        ${amountText} </span>
                 `;
                 wishesDisplay.appendChild(card);
             });
         }
         
         // ===================================
-        // ⬇️ Main Entry Point
+        // ⬇️ Main Entry Point (มีการแก้ไข Mockup Data)
         // ===================================
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -493,16 +478,18 @@
                 document.getElementById('profile-picture').src = 'https://via.placeholder.com/50';
                 document.getElementById('profile-name').textContent = 'Test User (Mock)';
                 
-                // สร้าง Mock Data สำหรับเรนเดอร์ (มี amount สำหรับการ์ดแรก)
+                // สร้าง Mock Data สำหรับเรนเดอร์ (เพิ่ม amount เพื่อทดสอบการแสดงผล)
                 allWishes = [
                     // 🚨 เพิ่ม amount > 0 สำหรับการ์ดนี้
                     { id: 1, line_user_id: 'Uother_id_1', name: 'คุณแม่', message: 'ลูกรัก! แม่ภูมิใจในตัวลูกที่สุดเลยนะ 💖', amount: 5000.00 },
                     // amount = 0 หรือไม่มีฟิลด์นี้ จะไม่แสดงมูลค่า
-                    { id: 99, line_user_id: myUserId, name: 'Test User (Mock)', message: 'นี่คือคำอวยพรจำลองของผู้ใช้ที่ล็อกอินอยู่' },
+                    { id: 99, line_user_id: myUserId, name: 'Test User (Mock)', message: 'นี่คือคำอวยพรจำลองของผู้ใช้ที่ล็อกอินอยู่', amount: 0.00 },
                 ];
                 loadAndRenderWishes('Test User (Mock)');
             }
         });
+
     </script>
 </body>
+
 </html>
