@@ -165,9 +165,9 @@
             font-weight: 600;
         }
 
-        /* NEW: Modal Styles */
+        /* NEW: Modal Styles (ปรับขนาด 40%) */
         .modal-overlay {
-            display: none; /* เริ่มต้นซ่อนไว้ */
+            display: none; 
             position: fixed;
             top: 0;
             left: 0;
@@ -185,21 +185,26 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             max-width: 90%;
-            width: 560px; /* 🚨 ปรับขนาดเพิ่ม 40% */
+            width: 560px; /* 🚨 NEW: 400px * 1.4 = 560px */
             text-align: center;
             animation: popIn 0.3s ease-out; 
         }
         .thank-you-image {
-            width: 210px; /* 🚨 ปรับขนาดเพิ่ม 40% */
+            width: 210px; /* 🚨 NEW: 150px * 1.4 = 210px */
             height: 210px;
             border-radius: 50%;
             object-fit: cover;
             margin-bottom: 20px;
             border: 4px solid #ffd54f;
         }
+        .support-button-wrapper { /* 🚨 NEW: wrapper เพื่อจัดปุ่มให้อยู่กึ่งกลาง */
+            display: flex;
+            justify-content: center;
+            margin: 20px 0 10px 0;
+        }
         .support-button {
-            display: block;
-            background-color: #4CAF50; /* Green color for donation button */
+            /* display: block; ถูกลบออกเพื่อให้ wrapper จัดการการจัดกึ่งกลาง */
+            background-color: #4CAF50; 
             color: white;
             padding: 12px 20px;
             border: none;
@@ -208,7 +213,6 @@
             font-size: 18px;
             font-weight: 700;
             text-decoration: none;
-            margin: 20px 0 10px 0;
             transition: background-color 0.3s;
         }
         .support-button:hover { background-color: #45a049; }
@@ -221,6 +225,7 @@
             cursor: pointer;
             font-size: 14px;
             transition: background-color 0.3s;
+            margin-top: 10px; /* เพิ่มระยะห่างด้านบน */
         }
         .close-modal-btn:hover { background-color: #888; }
     </style>
@@ -269,9 +274,12 @@
             <img src="ขอบคุณ.png" alt="รูปภาพขอบคุณ" class="thank-you-image">
             <h3>🙏 ขอบคุณสำหรับคำอวยพร!</h3>
             <p>ขอขอบคุณจากใจสำหรับคำอวยพรเนื่องในพิธีจบการศึกษาครั้งนี้ ขอให้คุณ/ท่าน ประสบแต่ความสุข ความเจริญรุ่งเรืองในทุกสิ่งที่ปรารถนาเช่นกันครับ/ค่ะ! 🎉</p>
-            <button onclick="openSupportWindow()" class="support-button">
-                🎁 สนับสนุนค่าใช้จ่าย
-            </button>
+            
+            <div class="support-button-wrapper"> <a href="https://liff.line.me/2008162847-GV9l2wmz" target="_blank" class="support-button">
+                    🎁 สนับสนุนค่าใช้จ่าย
+                </a>
+            </div>
+            
             <button onclick="document.getElementById('thank-you-modal').style.display='none'" class="close-modal-btn">
                 ปิด
             </button>
@@ -287,7 +295,7 @@
         const apiBaseUrl = 'https://wish-website-be.onrender.com';
         const apiEndpoint = `${apiBaseUrl}/wishes`; 
 
-        let allWishes = []; // ข้อมูลจะถูกดึงมาเก็บที่นี่
+        let allWishes = []; 
         // ** END CONFIGURATION **
 
         // DOM Elements
@@ -327,24 +335,6 @@
                 loginMessage.innerHTML = '<p>❌ เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF กรุณาลองเปิดในแอป LINE</p>';
             }
         }
-        
-        /** ฟังก์ชันสำหรับปุ่ม "สนับสนุนค่าใช้จ่าย" ใน Modal */
-        function openSupportWindow() {
-            const supportUrl = 'https://liff.line.me/2008162847-GV9l2wmz';
-            // สำหรับ LIFF ที่เปิดในแอป LINE ควรใช้ liff.openWindow
-            if (typeof liff !== 'undefined' && liff.isInClient()) {
-                liff.openWindow({
-                    url: supportUrl,
-                    external: true // เปิดในเบราว์เซอร์ภายนอก LINE
-                });
-            } else {
-                // สำหรับการทดสอบในเบราว์เซอร์ปกติ
-                window.open(supportUrl, '_blank');
-            }
-            // ปิด Modal หลังกดปุ่ม
-            document.getElementById('thank-you-modal').style.display = 'none';
-        }
-
 
         // ===================================
         // 🌐 API Call Functions
@@ -394,7 +384,6 @@
 
             let currentUserWish = getCurrentUserWish();
             let method = currentUserWish ? 'PUT' : 'POST';
-            // สมมติว่า Backend ใช้ ID เป็น Parameter สำหรับการอัปเดต (PUT)
             let url = currentUserWish ? `${apiEndpoint}/${currentUserWish.id}` : apiEndpoint; 
 
             try {
@@ -493,7 +482,6 @@
         }
 
         function getCurrentUserWish() {
-            // สมมติว่า API คืนค่า object ที่มี key เป็น line_user_id
             return allWishes.find(wish => wish.line_user_id === myUserId);
         }
 
@@ -503,7 +491,6 @@
             const currentUserWish = getCurrentUserWish();
             let sortedWishes = [...allWishes].filter(wish => wish.line_user_id !== myUserId);
             if (currentUserWish) {
-                // นำคำอวยพรของผู้ใช้ปัจจุบันมาไว้ข้างหน้าสุด
                 sortedWishes.unshift(currentUserWish);
             }
 
@@ -519,7 +506,6 @@
                 let colorIndex = index % noteColors.length;
                 let cardColor = noteColors[colorIndex];
                 
-                // เน้นการ์ดของผู้ใช้ปัจจุบัน
                 if (wish.line_user_id === myUserId) { 
                     cardColor = '#a8e6cf'; 
                     card.style.fontWeight = '600'; 
@@ -533,16 +519,13 @@
 
                 // Logic การแสดงมูลค่า (Amount)
                 let amountText = '';
-                // แปลงค่าจาก DB เป็นตัวเลข (NUMERIC) และใช้ 0 เป็นค่าเริ่มต้น
                 const amountValue = parseFloat(wish.amount) || 0; 
                 
                 if (amountValue > 0) {
-                    // จัดรูปแบบตัวเลขให้อ่านง่าย เช่น 5000 -> 5,000
                     const formattedAmount = amountValue.toLocaleString('th-TH', { 
                         minimumFractionDigits: 0, 
                         maximumFractionDigits: 2 
                     });
-                    // เพิ่มสไตล์สำหรับมูลค่า
                     amountText = `<span style="color: #c51162; font-weight: 700; margin-left: 10px;">🎁 ${formattedAmount} บาท</span>`;
                 }
                 // ----------------------------------------------------
@@ -552,7 +535,8 @@
                     <span class="author">
                         — ${wish.name} 
                         ${wish.line_user_id === myUserId ? ' (ของคุณ)' : ''}
-                        ${amountText} </span>
+                        ${amountText} 
+                    </span>
                 `;
                 wishesDisplay.appendChild(card);
             });
@@ -566,7 +550,7 @@
             if (typeof liff !== 'undefined') {
                 initializeLiff();
             }
-            // ลบ Mockup Logic block ออก
+            // ลบ Mockup Logic สำหรับเบราว์เซอร์ออกแล้ว
         });
 
     </script>
