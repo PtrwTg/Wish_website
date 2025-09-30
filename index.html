@@ -185,13 +185,13 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             max-width: 90%;
-            width: 400px;
+            width: 560px; /* 🚨 ปรับขนาดเพิ่ม 40% */
             text-align: center;
-            animation: popIn 0.3s ease-out; /* ใช้อนิเมชัน popIn เดิม */
+            animation: popIn 0.3s ease-out; 
         }
         .thank-you-image {
-            width: 150px;
-            height: 150px;
+            width: 210px; /* 🚨 ปรับขนาดเพิ่ม 40% */
+            height: 210px;
             border-radius: 50%;
             object-fit: cover;
             margin-bottom: 20px;
@@ -269,9 +269,9 @@
             <img src="ขอบคุณ.png" alt="รูปภาพขอบคุณ" class="thank-you-image">
             <h3>🙏 ขอบคุณสำหรับคำอวยพร!</h3>
             <p>ขอขอบคุณจากใจสำหรับคำอวยพรเนื่องในพิธีจบการศึกษาครั้งนี้ ขอให้คุณ/ท่าน ประสบแต่ความสุข ความเจริญรุ่งเรืองในทุกสิ่งที่ปรารถนาเช่นกันครับ/ค่ะ! 🎉</p>
-            <a href="https://liff.line.me/2008162847-GV9l2wmz" target="_blank" class="support-button">
+            <button onclick="openSupportWindow()" class="support-button">
                 🎁 สนับสนุนค่าใช้จ่าย
-            </a>
+            </button>
             <button onclick="document.getElementById('thank-you-modal').style.display='none'" class="close-modal-btn">
                 ปิด
             </button>
@@ -327,6 +327,24 @@
                 loginMessage.innerHTML = '<p>❌ เกิดข้อผิดพลาดในการเชื่อมต่อ LINE LIFF กรุณาลองเปิดในแอป LINE</p>';
             }
         }
+        
+        /** ฟังก์ชันสำหรับปุ่ม "สนับสนุนค่าใช้จ่าย" ใน Modal */
+        function openSupportWindow() {
+            const supportUrl = 'https://liff.line.me/2008162847-GV9l2wmz';
+            // สำหรับ LIFF ที่เปิดในแอป LINE ควรใช้ liff.openWindow
+            if (typeof liff !== 'undefined' && liff.isInClient()) {
+                liff.openWindow({
+                    url: supportUrl,
+                    external: true // เปิดในเบราว์เซอร์ภายนอก LINE
+                });
+            } else {
+                // สำหรับการทดสอบในเบราว์เซอร์ปกติ
+                window.open(supportUrl, '_blank');
+            }
+            // ปิด Modal หลังกดปุ่ม
+            document.getElementById('thank-you-modal').style.display = 'none';
+        }
+
 
         // ===================================
         // 🌐 API Call Functions
@@ -372,7 +390,6 @@
                 line_user_id: myUserId, 
                 name: name,
                 message: message
-                // ไม่ต้องส่ง amount: Admin จัดการใน Backend
             };
 
             let currentUserWish = getCurrentUserWish();
@@ -453,7 +470,7 @@
         }
         
         // ===================================
-        // 🎨 UI/Rendering Logic 
+        // 🎨 UI/Rendering Logic (พร้อม Logic แสดงผลค่าเงิน)
         // ===================================
 
         function loadAndRenderWishes(defaultName) {
@@ -516,13 +533,16 @@
 
                 // Logic การแสดงมูลค่า (Amount)
                 let amountText = '';
+                // แปลงค่าจาก DB เป็นตัวเลข (NUMERIC) และใช้ 0 เป็นค่าเริ่มต้น
                 const amountValue = parseFloat(wish.amount) || 0; 
                 
                 if (amountValue > 0) {
+                    // จัดรูปแบบตัวเลขให้อ่านง่าย เช่น 5000 -> 5,000
                     const formattedAmount = amountValue.toLocaleString('th-TH', { 
                         minimumFractionDigits: 0, 
                         maximumFractionDigits: 2 
                     });
+                    // เพิ่มสไตล์สำหรับมูลค่า
                     amountText = `<span style="color: #c51162; font-weight: 700; margin-left: 10px;">🎁 ${formattedAmount} บาท</span>`;
                 }
                 // ----------------------------------------------------
@@ -532,21 +552,21 @@
                     <span class="author">
                         — ${wish.name} 
                         ${wish.line_user_id === myUserId ? ' (ของคุณ)' : ''}
-                        ${amountText}
-                    </span>
+                        ${amountText} </span>
                 `;
                 wishesDisplay.appendChild(card);
             });
         }
         
         // ===================================
-        // ⬇️ Main Entry Point
+        // ⬇️ Main Entry Point (ไม่มี Mockup Logic)
         // ===================================
         
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof liff !== 'undefined') {
                 initializeLiff();
             }
+            // ลบ Mockup Logic block ออก
         });
 
     </script>
