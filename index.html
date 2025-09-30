@@ -164,6 +164,65 @@
             font-size: 1.1em;
             font-weight: 600;
         }
+
+        /* NEW: Modal Styles */
+        .modal-overlay {
+            display: none; /* เริ่มต้นซ่อนไว้ */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            animation: popIn 0.3s ease-out; /* ใช้อนิเมชัน popIn เดิม */
+        }
+        .thank-you-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 4px solid #ffd54f;
+        }
+        .support-button {
+            display: block;
+            background-color: #4CAF50; /* Green color for donation button */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            margin: 20px 0 10px 0;
+            transition: background-color 0.3s;
+        }
+        .support-button:hover { background-color: #45a049; }
+        .close-modal-btn {
+            background-color: #aaa;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .close-modal-btn:hover { background-color: #888; }
     </style>
 </head>
 <body>
@@ -203,6 +262,20 @@
             <p id="form-status" style="margin-top: 15px; font-weight: 600; color: #4a148c;"></p>
         </div>
 
+    </div>
+
+    <div id="thank-you-modal" class="modal-overlay">
+        <div class="modal-content">
+            <img src="ขอบคุณ.png" alt="รูปภาพขอบคุณ" class="thank-you-image">
+            <h3>🙏 ขอบคุณสำหรับคำอวยพร!</h3>
+            <p>ขอขอบคุณจากใจสำหรับคำอวยพรเนื่องในพิธีจบการศึกษาครั้งนี้ ขอให้คุณ/ท่าน ประสบแต่ความสุข ความเจริญรุ่งเรืองในทุกสิ่งที่ปรารถนาเช่นกันครับ/ค่ะ! 🎉</p>
+            <a href="https://liff.line.me/2008162847-GV9l2wmz" target="_blank" class="support-button">
+                🎁 สนับสนุนค่าใช้จ่าย
+            </a>
+            <button onclick="document.getElementById('thank-you-modal').style.display='none'" class="close-modal-btn">
+                ปิด
+            </button>
+        </div>
     </div>
 
     <script>
@@ -321,6 +394,12 @@
                     // ดึงข้อมูลใหม่และเรนเดอร์ทั้งหมดหลังการบันทึกสำเร็จ
                     const profile = await liff.getProfile();
                     await fetchAndLoadWishes(profile.displayName); 
+
+                    // 🚨 NEW: แสดง Modal ขอบคุณหลังจาก 3 วินาที
+                    setTimeout(() => {
+                        document.getElementById('thank-you-modal').style.display = 'flex';
+                    }, 3000); // 3000 milliseconds = 3 วินาที
+
                 } else {
                     const errorData = await response.json().catch(() => ({ error: 'Unknown Server Error' }));
                     statusText.textContent = `❗ เกิดข้อผิดพลาด: ${errorData.error || 'Server Error'}`;
@@ -374,7 +453,7 @@
         }
         
         // ===================================
-        // 🎨 UI/Rendering Logic (พร้อม Logic แสดงผลค่าเงิน)
+        // 🎨 UI/Rendering Logic 
         // ===================================
 
         function loadAndRenderWishes(defaultName) {
@@ -435,20 +514,15 @@
                 card.style.setProperty('--random-rotation', `${randomRotation}deg`); 
                 card.style.animationDelay = `${index * 0.1}s`; 
 
-                // ----------------------------------------------------
-                // 🎁 NEW: Logic การแสดงมูลค่า (Amount)
+                // Logic การแสดงมูลค่า (Amount)
                 let amountText = '';
-                // แปลงค่าจาก DB เป็นตัวเลข (NUMERIC) และใช้ 0 เป็นค่าเริ่มต้น
-                // Note: PostgreSQL ส่ง NUMERIC เป็น string
                 const amountValue = parseFloat(wish.amount) || 0; 
                 
                 if (amountValue > 0) {
-                    // จัดรูปแบบตัวเลขให้อ่านง่าย เช่น 5000 -> 5,000
                     const formattedAmount = amountValue.toLocaleString('th-TH', { 
                         minimumFractionDigits: 0, 
                         maximumFractionDigits: 2 
                     });
-                    // เพิ่มสไตล์สำหรับมูลค่า
                     amountText = `<span style="color: #c51162; font-weight: 700; margin-left: 10px;">🎁 ${formattedAmount} บาท</span>`;
                 }
                 // ----------------------------------------------------
@@ -458,21 +532,21 @@
                     <span class="author">
                         — ${wish.name} 
                         ${wish.line_user_id === myUserId ? ' (ของคุณ)' : ''}
-                        ${amountText} </span>
+                        ${amountText}
+                    </span>
                 `;
                 wishesDisplay.appendChild(card);
             });
         }
         
         // ===================================
-        // ⬇️ Main Entry Point (ไม่มี Mockup Logic)
+        // ⬇️ Main Entry Point
         // ===================================
         
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof liff !== 'undefined') {
                 initializeLiff();
             }
-            // 🚨 ลบ Mockup Logic block ออกตามคำขอ
         });
 
     </script>
